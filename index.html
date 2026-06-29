@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的雅思小基地 ✨</title>
+  <style>
+    :root {
+      --primary: #7c6af7;
+      --primary-light: #a89cf7;
+      --accent: #f7a06a;
+      --accent2: #6acff7;
+      --green: #5ecf8e;
+      --yellow: #f7d46a;
+      --red: #f76a6a;
+      --bg: #f5f3ff;
+      --card: #ffffff;
+      --text: #2d2b55;
+      --text-light: #888;
+      --radius: 18px;
+      --shadow: 0 4px 24px rgba(124,106,247,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent2) 100%);
+      padding: 28px 20px 20px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: 20px;
+      width: 100px; height: 100px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
+    .header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+    .streak-badge {
+      background: rgba(255,255,255,0.22);
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 16px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 14px 10px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-num { font-size: 1.6rem; font-weight: 800; color: var(--primary); line-height: 1; }
+    .stat-label { font-size: 0.7rem; color: var(--text-light); margin-top: 4px; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 0 16px 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--text-light);
+      box-shadow: var(--shadow);
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Section */
+    .section { padding: 0 16px; }
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Vocab Card */
+    .vocab-grid { display: flex; flex-direction: column; gap: 12px; }
+    .vocab-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      perspective: 800px;
+      cursor: pointer;
+    }
+    .vocab-card-inner {
+      position: relative;
+      transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+      transform-style: preserve-3d;
+      min-height: 130px;
+    }
+    .vocab-card.flipped .vocab-card-inner { transform: rotateY(180deg); }
+    .vocab-front, .vocab-back {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .vocab-back { transform: rotateY(180deg); background: linear-gradient(135deg, #f0edff, #e8f5ff); }
+    .vocab-word { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+    .vocab-phonetic { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; }
+    .vocab-hint { font-size: 0.75rem; color: var(--text-light); align-self: flex-end; }
+    .vocab-meaning { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .vocab-sentence { font-size: 0.8rem; color: var(--text-light); margin-top: 6px; font-style: italic; }
+    .vocab-memory { font-size: 0.8rem; color: var(--accent); margin-top: 6px; }
+    .status-row { display: flex; gap: 6px; margin-top: 10px; }
+    .status-btn {
+      flex: 1; padding: 7px 4px; border-radius: 50px; border: none;
+      font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-new { background: #fff0f0; color: var(--red); }
+    .btn-shaky { background: #fff8e6; color: #e6a020; }
+    .btn-mastered { background: #f0fff6; color: var(--green); }
+    .btn-new.active { background: var(--red); color: white; }
+    .btn-shaky.active { background: var(--yellow); color: #7a5500; }
+    .btn-mastered.active { background: var(--green); color: white; }
+
+    /* Status badge on front */
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .badge-new { background: #fff0f0; color: var(--red); }
+    .badge-shaky { background: #fff8e6; color: #e6a020; }
+    .badge-mastered { background: #f0fff6; color: var(--green); }
+
+    /* Add word form */
+    .add-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .add-card h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 12px; color: var(--primary); }
+    .form-row { display: flex; flex-direction: column; gap: 8px; }
+    .form-row input, .form-row textarea {
+      border: 1.5px solid #e8e4ff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      outline: none;
+      font-family: inherit;
+      color: var(--text);
+      transition: border 0.2s;
+      background: var(--bg);
+    }
+    .form-row input:focus, .form-row textarea:focus { border-color: var(--primary); }
+    .form-row textarea { resize: none; height: 60px; }
+    .btn-add {
+      width: 100%; padding: 12px; border-radius: 12px; border: none;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; margin-top: 8px;
+      transition: opacity 0.2s;
+    }
+    .btn-add:active { opacity: 0.8; }
+
+    /* Grammar */
+    .grammar-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .grammar-title { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .wrong-right {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .wrong-box, .right-box {
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 0.8rem;
+    }
+    .wrong-box { background: #fff0f0; border-left: 3px solid var(--red); }
+    .right-box { background: #f0fff6; border-left: 3px solid var(--green); }
+    .box-label { font-size: 0.65rem; font-weight: 700; margin-bottom: 4px; opacity: 0.6; }
+    .grammar-note { font-size: 0.78rem; color: var(--text-light); margin-top: 6px; }
+    .grammar-rule {
+      background: linear-gradient(135deg, #f0edff, #e8f5ff);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    /* Daily Log */
+    .log-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .log-date { font-size: 0.75rem; color: var(--text-light); margin-bottom: 8px; }
+    .log-content { font-size: 0.88rem; line-height: 1.6; }
+    .log-tag {
+      display: inline-block;
+      background: #f0edff;
+      color: var(--primary);
+      border-radius: 50px;
+      padding: 3px 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-right: 4px;
+      margin-top: 8px;
+    }
+
+    /* Today's Log Input */
+    .today-log {
+      background: linear-gradient(135deg, #f0edff 0%, #e8f5ff 100%);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .today-log h3 { font-size: 0.88rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+    .today-log textarea {
+      width: 100%;
+      border: 1.5px solid #d4cfff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      background: white;
+      outline: none;
+      resize: none;
+      height: 80px;
+      color: var(--text);
+    }
+    .log-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .btn-log {
+      flex: 1; padding: 10px; border-radius: 10px; border: none;
+      background: var(--primary); color: white;
+      font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white;
+      border-top: 1px solid #ece9ff;
+      display: flex;
+      padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 20px rgba(124,106,247,0.08);
+    }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      cursor: pointer; padding: 4px 0;
+      background: none; border: none;
+    }
+    .nav-icon { font-size: 1.3rem; }
+    .nav-label { font-size: 0.65rem; color: var(--text-light); font-weight: 600; }
+    .nav-item.active .nav-label { color: var(--primary); }
+
+    /* Page visibility */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+    }
+    .empty-state .emoji { font-size: 2.5rem; margin-bottom: 10px; }
+    .empty-state p { font-size: 0.88rem; }
+
+    /* Filter pills */
+    .filter-row {
+      display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto;
+      scrollbar-width: none; padding-bottom: 2px;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      flex-shrink: 0;
+      padding: 5px 14px;
+      border-radius: 50px;
+      border: 1.5px solid #e0dbff;
+      background: white;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+    }
+    .filter-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+      background: #2d2b55; color: white;
+      padding: 10px 20px; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 600;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; white-space: nowrap; z-index: 999;
+    }
+    .toast.show { opacity: 1; }
+
+    /* Progress bar */
+    .progress-wrap { margin: 4px 0 10px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-light); margin-bottom: 5px; }
+    .progress-bar { height: 8px; background: #ede9ff; border-radius: 50px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, var(--primary), var(--accent2)); transition: width 0.4s; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>我的雅思小基地 ✨</h1>
+      <p id="header-date">今天也要加油哦～</p>
+    </div>
+    <div class="streak-badge">🔥 <span id="streak-count">0</span> 天连续</div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-num" id="stat-mastered">0</div>
+    <div class="stat-label">✅ 已掌握</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" id="stat-shaky">0</div>
+    <div class="stat-label">😅 模糊中</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" id="stat-new">0</div>
+    <div class="stat-label">🆕 新单词</div>
+  </div>
+</div>
+
+<!-- Pages -->
+<!-- VOCAB PAGE -->
+<div class="page active" id="page-vocab">
+  <div class="section">
+    <div class="section-title">📚 词汇卡片</div>
+
+    <!-- Add Word -->
+    <div class="add-card">
+      <h3>➕ 添加新单词</h3>
+      <div class="form-row">
+        <input id="new-word" type="text" placeholder="单词（如 ambiguous）" />
+        <input id="new-phonetic" type="text" placeholder="音标（可选，如 /æmˈbɪɡjuəs/）" />
+        <input id="new-meaning" type="text" placeholder="中文意思" />
+        <textarea id="new-sentence" placeholder="你的例句（用英文写，帮助记忆）"></textarea>
+        <textarea id="new-memory" placeholder="你的联想 / 记忆技巧（可以很搞笑😂）"></textarea>
+      </div>
+      <button class="btn-add" onclick="addWord()">加入词库 ✨</button>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-row">
+      <button class="filter-pill active" onclick="filterVocab('all', this)">全部</button>
+      <button class="filter-pill" onclick="filterVocab('new', this)">🆕 新单词</button>
+      <button class="filter-pill" onclick="filterVocab('shaky', this)">😅 模糊</button>
+      <button class="filter-pill" onclick="filterVocab('mastered', this)">✅ 已掌握</button>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>掌握进度</span>
+        <span id="progress-text">0 / 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="vocab-grid" id="vocab-list"></div>
+  </div>
+</div>
+
+<!-- GRAMMAR PAGE -->
+<div class="page" id="page-grammar">
+  <div class="section">
+    <div class="section-title">📝 语法错题本</div>
+
+    <!-- Add Mistake -->
+    <div class="add-card">
+      <h3>➕ 记录一个错误</h3>
+      <div class="form-row">
+        <input id="g-title" type="text" placeholder="错误类型（如：时态混用）" />
+        <input id="g-wrong" type="text" placeholder="错误句子" />
+        <input id="g-right" type="text" placeholder="正确句子" />
+        <textarea id="g-note" placeholder="为什么错了？怎么记住？"></textarea>
+        <input id="g-rule" type="text" placeholder="对应的语法规则（简短）" />
+      </div>
+      <button class="btn-add" onclick="addGrammar()">记录错误 📌</button>
+    </div>
+
+    <div id="grammar-list"></div>
+  </div>
+</div>
+
+<!-- LOG PAGE -->
+<div class="page" id="page-log">
+  <div class="section">
+    <div class="section-title">📅 每日打卡</div>
+
+    <div class="today-log">
+      <h3>✍️ 今天学了什么？</h3>
+      <textarea id="log-text" placeholder="今天背了几个词？做了什么练习？遇到了什么难点？随便写～"></textarea>
+      <div class="log-actions">
+        <button class="btn-log" onclick="saveLog()">打卡！🎉</button>
+      </div>
+    </div>
+
+    <div id="log-list"></div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <button class="nav-item active" id="nav-vocab" onclick="switchPage('vocab')">
+    <span class="nav-icon">📚</span>
+    <span class="nav-label">词汇</span>
+  </button>
+  <button class="nav-item" id="nav-grammar" onclick="switchPage('grammar')">
+    <span class="nav-icon">📝</span>
+    <span class="nav-label">语法</span>
+  </button>
+  <button class="nav-item" id="nav-log" onclick="switchPage('log')">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">打卡</span>
+  </button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---- Data ----
+  let data = JSON.parse(localStorage.getItem('ielts-data') || 'null') || {
+    words: [], grammar: [], logs: [], streak: 0, lastLogDate: null
+  };
+
+  // Seed sample data if empty
+  if (data.words.length === 0) {
+    data.words = [
+      { id: 1, word: 'ambiguous', phonetic: '/æmˈbɪɡjuəs/', meaning: '模棱两可的', sentence: 'The instructions were ambiguous and confusing.', memory: '就像我对学雅思的态度 😂', status: 'new' },
+      { id: 2, word: 'meticulous', phonetic: '/məˈtɪkjələs/', meaning: '一丝不苟的，极其细心的', sentence: 'She was meticulous in her preparation for the exam.', memory: 'me + tick（打勾）+ ulous = 每一项都打勾✓', status: 'shaky' },
+      { id: 3, word: 'prevalent', phonetic: '/ˈprevələnt/', meaning: '普遍的，盛行的', sentence: 'The use of smartphones is prevalent among young people.', memory: 'pre（之前）+ val（价值）+ ent → 之前就很有分量，说明很普遍', status: 'new' },
+    ];
+    save();
+  }
+  if (data.grammar.length === 0) {
+    data.grammar = [
+      { id: 1, title: '主谓一致', wrong: 'The number of students are increasing.', right: 'The number of students is increasing.', note: '"The number of" 后面接单数动词！', rule: 'The number of + 名词 → 单数' },
+    ];
+    save();
+  }
+
+  function save() {
+    localStorage.setItem('ielts-data', JSON.stringify(data));
+    updateStats();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ---- Stats ----
+  function updateStats() {
+    const mastered = data.words.filter(w => w.status === 'mastered').length;
+    const shaky = data.words.filter(w => w.status === 'shaky').length;
+    const newW = data.words.filter(w => w.status === 'new').length;
+    document.getElementById('stat-mastered').textContent = mastered;
+    document.getElementById('stat-shaky').textContent = shaky;
+    document.getElementById('stat-new').textContent = newW;
+    document.getElementById('streak-count').textContent = data.streak;
+    const total = data.words.length;
+    document.getElementById('progress-text').textContent = `${mastered} / ${total}`;
+    document.getElementById('progress-fill').style.width = total ? `${Math.round(mastered/total*100)}%` : '0%';
+  }
+
+  // ---- Header date ----
+  function initDate() {
+    const now = new Date();
+    const days = ['日','一','二','三','四','五','六'];
+    document.getElementById('header-date').textContent =
+      `${now.getMonth()+1}月${now.getDate()}日 星期${days[now.getDay()]}`;
+  }
+
+  // ---- Pages ----
+  function switchPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(`page-${name}`).classList.add('active');
+    document.getElementById(`nav-${name}`).classList.add('active');
+    if (name === 'vocab') renderVocab();
+    if (name === 'grammar') renderGrammar();
+    if (name === 'log') renderLog();
+  }
+
+  // ---- VOCAB ----
+  let vocabFilter = 'all';
+
+  function filterVocab(f, el) {
+    vocabFilter = f;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    renderVocab();
+  }
+
+  function renderVocab() {
+    const list = document.getElementById('vocab-list');
+    const words = vocabFilter === 'all' ? data.words : data.words.filter(w => w.status === vocabFilter);
+    if (words.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="emoji">🌱</div><p>${vocabFilter === 'all' ? '还没有单词，快去添加第一个！' : '这个分类还没有单词哦'}</p></div>`;
+      return;
+    }
+    list.innerHTML = words.map(w => `
+      <div class="vocab-card" id="vc-${w.id}" onclick="flipCard(${w.id}, event)">
+        <div class="vocab-card-inner">
+          <div class="vocab-front">
+            <div>
+              <div class="vocab-word">${w.word}</div>
+              ${w.phonetic ? `<div class="vocab-phonetic">${w.phonetic}</div>` : ''}
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <span class="status-badge ${w.status === 'new' ? 'badge-new' : w.status === 'shaky' ? 'badge-shaky' : 'badge-mastered'}">
+                ${w.status === 'new' ? '🆕 新' : w.status === 'shaky' ? '😅 模糊' : '✅ 掌握'}
+              </span>
+              <span class="vocab-hint">点击翻面 →</span>
+            </div>
+          </div>
+          <div class="vocab-back">
+            <div>
+              <div class="vocab-meaning">${w.meaning}</div>
+              ${w.sentence ? `<div class="vocab-sentence">"${w.sentence}"</div>` : ''}
+              ${w.memory ? `<div class="vocab-memory">💡 ${w.memory}</div>` : ''}
+            </div>
+            <div class="status-row" onclick="event.stopPropagation()">
+              <button class="status-btn btn-new ${w.status==='new'?'active':''}" onclick="setStatus(${w.id},'new')">🆕 新</button>
+              <button class="status-btn btn-shaky ${w.status==='shaky'?'active':''}" onclick="setStatus(${w.id},'shaky')">😅 模糊</button>
+              <button class="status-btn btn-mastered ${w.status==='mastered'?'active':''}" onclick="setStatus(${w.id},'mastered')">✅ 掌握</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function flipCard(id, e) {
+    const card = document.getElementById(`vc-${id}`);
+    card.classList.toggle('flipped');
+  }
+
+  function setStatus(id, status) {
+    const w = data.words.find(x => x.id === id);
+    if (w) { w.status = status; save(); renderVocab(); }
+    const msgs = { mastered: '太棒了！又掌握一个单词 ✅', shaky: '继续加油，快要掌握了 💪', new: '加入新单词啦 🆕' };
+    showToast(msgs[status]);
+  }
+
+  function addWord() {
+    const word = document.getElementById('new-word').value.trim();
+    const meaning = document.getElementById('new-meaning').value.trim();
+    if (!word || !meaning) { showToast('单词和意思不能为空哦 😊'); return; }
+    data.words.unshift({
+      id: Date.now(),
+      word, meaning,
+      phonetic: document.getElementById('new-phonetic').value.trim(),
+      sentence: document.getElementById('new-sentence').value.trim(),
+      memory: document.getElementById('new-memory').value.trim(),
+      status: 'new'
+    });
+    ['new-word','new-phonetic','new-meaning','new-sentence','new-memory'].forEach(id => document.getElementById(id).value = '');
+    save(); renderVocab();
+    showToast(`"${word}" 已加入词库！🎉`);
+  }
+
+  // ---- GRAMMAR ----
+  function renderGrammar() {
+    const list = document.getElementById('grammar-list');
+    if (data.grammar.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="emoji">🎉</div><p>暂时没有语法错误记录，继续保持！</p></div>`;
+      return;
+    }
+    list.innerHTML = data.grammar.map(g => `
+      <div class="grammar-card">
+        <div class="grammar-title">⚠️ ${g.title}</div>
+        <div class="wrong-right">
+          <div class="wrong-box"><div class="box-label">❌ 错误</div>${g.wrong}</div>
+          <div class="right-box"><div class="box-label">✅ 正确</div>${g.right}</div>
+        </div>
+        ${g.note ? `<div class="grammar-note">📌 ${g.note}</div>` : ''}
+        ${g.rule ? `<div class="grammar-rule">📖 规则：${g.rule}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function addGrammar() {
+    const title = document.getElementById('g-title').value.trim();
+    const wrong = document.getElementById('g-wrong').value.trim();
+    const right = document.getElementById('g-right').value.trim();
+    if (!title || !wrong || !right) { showToast('类型、错误句和正确句都要填哦'); return; }
+    data.grammar.unshift({
+      id: Date.now(), title, wrong, right,
+      note: document.getElementById('g-note').value.trim(),
+      rule: document.getElementById('g-rule').value.trim()
+    });
+    ['g-title','g-wrong','g-right','g-note','g-rule'].forEach(id => document.getElementById(id).value = '');
+    save(); renderGrammar();
+    showToast('语法错误已记录！下次不会再犯 💪');
+  }
+
+  // ---- LOG ----
+  function renderLog() {
+    const list = document.getElementById('log-list');
+    if (data.logs.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="emoji">📅</div><p>还没有打卡记录，今天来第一次吧！</p></div>`;
+      return;
+    }
+    list.innerHTML = data.logs.map(l => `
+      <div class="log-card">
+        <div class="log-date">📅 ${l.date}</div>
+        <div class="log-content">${l.text.replace(/\n/g,'<br>')}</div>
+      </div>
+    `).join('');
+  }
+
+  function saveLog() {
+    const text = document.getElementById('log-text').value.trim();
+    if (!text) { showToast('写点东西再打卡吧 😊'); return; }
+    const today = new Date().toLocaleDateString('zh-CN');
+    // Check streak
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('zh-CN');
+    if (data.lastLogDate === yesterday) { data.streak += 1; }
+    else if (data.lastLogDate !== today) { data.streak = 1; }
+    data.lastLogDate = today;
+    data.logs.unshift({ id: Date.now(), date: today, text });
+    document.getElementById('log-text').value = '';
+    save(); renderLog();
+    showToast(`打卡成功！🔥 已连续 ${data.streak} 天`);
+  }
+
+  // ---- Init ----
+  initDate();
+  updateStats();
+  renderVocab();
+</script>
+</body>
+</html>
