@@ -2,6 +2,8 @@ import { loadData, saveData } from './data.js';
 import { initVocab, renderVocab, addWord, filterVocab } from './vocab.js';
 import { initGrammar, renderGrammar, addGrammar } from './grammar.js';
 import { initLog, renderLog, saveLog } from './log.js';
+import { initReview, startReview, revealAnswer, markAnswer, exitReview } from './review.js';
+import { initPacks, renderPacks, importPack } from './packs.js';
 
 const data = loadData();
 const save = () => saveData(data);
@@ -9,6 +11,8 @@ const save = () => saveData(data);
 initVocab(data, save);
 initGrammar(data, save);
 initLog(data, save);
+initReview(data, save);
+initPacks(data, save);
 
 // ---- Header date ----
 function initDate() {
@@ -27,14 +31,21 @@ function switchPage(name) {
   if (name === 'vocab')   renderVocab();
   if (name === 'grammar') renderGrammar();
   if (name === 'log')     renderLog();
+  if (name === 'review')  exitReview();
+  if (name === 'packs')   renderPacks();
 }
 
 // ---- Expose handlers to HTML ----
-window.switchPage  = switchPage;
-window.addWord     = addWord;
-window.filterVocab = filterVocab;
-window.addGrammar  = addGrammar;
-window.saveLog     = saveLog;
+window.switchPage   = switchPage;
+window.addWord      = addWord;
+window.filterVocab  = filterVocab;
+window.addGrammar   = addGrammar;
+window.saveLog      = saveLog;
+window.startReview  = startReview;
+window.revealAnswer = revealAnswer;
+window.markAnswer   = markAnswer;
+window.exitReview   = exitReview;
+window.importPack   = importPack;
 
 // ---- Boot ----
 initDate();
