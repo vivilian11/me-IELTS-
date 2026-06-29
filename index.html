@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的雅思小基地 ✨</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>我的雅思小基地 ✨</h1>
+      <p id="header-date"></p>
+    </div>
+    <div class="streak-badge">🔥 <span id="streak-count">0</span> 天连续</div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-num" id="stat-mastered">0</div>
+    <div class="stat-label">✅ 已掌握</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" id="stat-shaky">0</div>
+    <div class="stat-label">😅 模糊中</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num" id="stat-new">0</div>
+    <div class="stat-label">🆕 新单词</div>
+  </div>
+</div>
+
+<!-- Vocab Page -->
+<div class="page active" id="page-vocab">
+  <div class="section">
+    <div class="section-title">📚 词汇卡片</div>
+
+    <div class="add-card">
+      <h3>➕ 添加新单词</h3>
+      <div class="form-row">
+        <input id="new-word"     type="text" placeholder="单词（如 ambiguous）" />
+        <input id="new-phonetic" type="text" placeholder="音标（可选）" />
+        <input id="new-meaning"  type="text" placeholder="中文意思" />
+        <textarea id="new-sentence" placeholder="你的例句（英文）"></textarea>
+        <textarea id="new-memory"   placeholder="你的联想 / 记忆技巧 😂"></textarea>
+      </div>
+      <button class="btn-add" onclick="addWord()">加入词库 ✨</button>
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-pill active" onclick="filterVocab('all', this)">全部</button>
+      <button class="filter-pill" onclick="filterVocab('new', this)">🆕 新单词</button>
+      <button class="filter-pill" onclick="filterVocab('shaky', this)">😅 模糊</button>
+      <button class="filter-pill" onclick="filterVocab('mastered', this)">✅ 已掌握</button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>掌握进度</span>
+        <span id="progress-text">0 / 0</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="vocab-grid" id="vocab-list"></div>
+  </div>
+</div>
+
+<!-- Grammar Page -->
+<div class="page" id="page-grammar">
+  <div class="section">
+    <div class="section-title">📝 语法错题本</div>
+
+    <div class="add-card">
+      <h3>➕ 记录一个错误</h3>
+      <div class="form-row">
+        <input id="g-title" type="text" placeholder="错误类型（如：时态混用）" />
+        <input id="g-wrong" type="text" placeholder="错误句子" />
+        <input id="g-right" type="text" placeholder="正确句子" />
+        <textarea id="g-note" placeholder="为什么错了？怎么记住？"></textarea>
+        <input id="g-rule"  type="text" placeholder="对应的语法规则（简短）" />
+      </div>
+      <button class="btn-add" onclick="addGrammar()">记录错误 📌</button>
+    </div>
+
+    <div id="grammar-list"></div>
+  </div>
+</div>
+
+<!-- Log Page -->
+<div class="page" id="page-log">
+  <div class="section">
+    <div class="section-title">📅 每日打卡</div>
+
+    <div class="today-log">
+      <h3>✍️ 今天学了什么？</h3>
+      <textarea id="log-text" placeholder="今天背了几个词？做了什么练习？随便写～"></textarea>
+      <div class="log-actions">
+        <button class="btn-log" onclick="saveLog()">打卡！🎉</button>
+      </div>
+    </div>
+
+    <div id="log-list"></div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <button class="nav-item active" id="nav-vocab" onclick="switchPage('vocab')">
+    <span class="nav-icon">📚</span>
+    <span class="nav-label">词汇</span>
+  </button>
+  <button class="nav-item" id="nav-grammar" onclick="switchPage('grammar')">
+    <span class="nav-icon">📝</span>
+    <span class="nav-label">语法</span>
+  </button>
+  <button class="nav-item" id="nav-log" onclick="switchPage('log')">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">打卡</span>
+  </button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
