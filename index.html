@@ -35,7 +35,7 @@
   </div>
 </div>
 
-<!-- Vocab Page -->
+<!-- ===== VOCAB PAGE ===== -->
 <div class="page active" id="page-vocab">
   <div class="section">
     <div class="section-title">📚 词汇卡片</div>
@@ -73,7 +73,86 @@
   </div>
 </div>
 
-<!-- Grammar Page -->
+<!-- ===== REVIEW PAGE ===== -->
+<div class="page" id="page-review">
+  <div class="section">
+    <div class="section-title">🎯 复习模式</div>
+
+    <!-- Setup -->
+    <div id="review-setup">
+      <p class="review-desc">每次随机抽 10 个单词，答对自动升级，答错会降级，帮你专注攻克薄弱词！</p>
+      <div class="review-mode-grid">
+        <div class="mode-card" onclick="startReview('weak')">
+          <div class="mode-icon">💪</div>
+          <div class="mode-name">攻克弱点</div>
+          <div class="mode-desc">只考新单词 + 模糊单词</div>
+        </div>
+        <div class="mode-card" onclick="startReview('all')">
+          <div class="mode-icon">🔀</div>
+          <div class="mode-name">随机混考</div>
+          <div class="mode-desc">从全部词库随机抽取</div>
+        </div>
+        <div class="mode-card" onclick="startReview('mastered')">
+          <div class="mode-icon">🏆</div>
+          <div class="mode-name">复习已掌握</div>
+          <div class="mode-desc">确认已掌握的词还记得</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session -->
+    <div id="review-session" style="display:none">
+      <div class="review-progress-wrap">
+        <div class="review-progress-label">
+          <span>进度</span>
+          <span id="review-progress-text">0 / 0</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="review-progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="review-word" id="review-word"></div>
+        <div class="review-phonetic" id="review-phonetic"></div>
+        <button class="btn-reveal" id="btn-reveal" onclick="revealAnswer()">点击查看答案</button>
+        <div id="review-answer" style="display:none">
+          <div class="review-meaning"  id="review-meaning"></div>
+          <div class="review-sentence" id="review-sentence"></div>
+          <div class="review-memory-tip" id="review-memory-tip"></div>
+        </div>
+      </div>
+
+      <div class="review-btns" id="review-btns" style="display:none">
+        <button class="btn-wrong" onclick="markAnswer(false)">😅 不记得</button>
+        <button class="btn-correct" onclick="markAnswer(true)">✅ 记得！</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="review-result" style="display:none">
+      <div class="result-card">
+        <div class="result-emoji" id="result-emoji">🏆</div>
+        <div class="result-score" id="result-score">0 / 0</div>
+        <div class="result-pct"   id="result-pct">0%</div>
+        <div class="result-msg"   id="result-msg"></div>
+        <button class="btn-add" onclick="exitReview()" style="margin-top:20px">再来一轮 🔄</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== PACKS PAGE ===== -->
+<div class="page" id="page-packs">
+  <div class="section">
+    <div class="section-title">📦 雅思词包</div>
+    <p class="review-desc">按话题整理的雅思高频词，一键导入到你的词库！</p>
+    <div id="packs-list"></div>
+  </div>
+</div>
+
+<!-- ===== GRAMMAR PAGE ===== -->
 <div class="page" id="page-grammar">
   <div class="section">
     <div class="section-title">📝 语法错题本</div>
@@ -94,7 +173,7 @@
   </div>
 </div>
 
-<!-- Log Page -->
+<!-- ===== LOG PAGE ===== -->
 <div class="page" id="page-log">
   <div class="section">
     <div class="section-title">📅 每日打卡</div>
@@ -116,6 +195,14 @@
   <button class="nav-item active" id="nav-vocab" onclick="switchPage('vocab')">
     <span class="nav-icon">📚</span>
     <span class="nav-label">词汇</span>
+  </button>
+  <button class="nav-item" id="nav-review" onclick="switchPage('review')">
+    <span class="nav-icon">🎯</span>
+    <span class="nav-label">复习</span>
+  </button>
+  <button class="nav-item" id="nav-packs" onclick="switchPage('packs')">
+    <span class="nav-icon">📦</span>
+    <span class="nav-label">词包</span>
   </button>
   <button class="nav-item" id="nav-grammar" onclick="switchPage('grammar')">
     <span class="nav-icon">📝</span>
